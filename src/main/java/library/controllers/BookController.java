@@ -5,10 +5,14 @@ import library.models.Book;
 import library.services.BookService;
 import library.services.PeopleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/books")
@@ -23,13 +27,15 @@ public class BookController {
     }
 
     @GetMapping()
-    public String index(Model model) {
-        model.addAttribute("books", bookService.findAll());
+    public String index(Model model, @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+                        @RequestParam(value = "books_per_page", required = false, defaultValue = "1000") int booksPerPage,
+                        @RequestParam(value = "sort_by_year", required = false, defaultValue = "false") Boolean sortByYear) {
+        model.addAttribute("books", bookService.findAll(page, booksPerPage, sortByYear));
         return "/books/index";
     }
 
     @GetMapping("/{id}")
-    public String show(@PathVariable("id") int id, Model model){
+    public String show(@PathVariable("id") int id, Model model) {
         model.addAttribute("book", bookService.findOne(id));
         model.addAttribute("owner", bookService.findOne(id).getOwner());
         model.addAttribute("people", peopleService.findAll());
@@ -55,20 +61,20 @@ public class BookController {
     }
 
     @PatchMapping("/{id}")
-    public String update(@PathVariable("id") int id, @ModelAttribute("book") @Valid Book book, BindingResult bindingResult){
-        if(bindingResult.hasErrors()) return "/books/edit";
+    public String update(@PathVariable("id") int id, @ModelAttribute("book") @Valid Book book, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) return "/books/edit";
         bookService.update(id, book);
         return "redirect:/books";
     }
 
     @PatchMapping("/{id}/free")
-    public String free(@PathVariable("id") int id){
+    public String free(@PathVariable("id") int id) {
         bookService.release(id);
         return "redirect:/books/{id}";
     }
 
     @PatchMapping("/{id}/take")
-    public String take(@PathVariable("id") int id, @ModelAttribute("book") Book book){
+    public String take(@PathVariable("id") int id, @ModelAttribute("book") Book book) {
         bookService.take(id, book);
         return "redirect:/books/{id}";
     }
