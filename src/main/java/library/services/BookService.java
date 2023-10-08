@@ -63,5 +63,8 @@ public class BookService {
         bookRepository.findById(id).orElse(null).setOwner(peopleRepository.findById(book.getOwnerId()).orElse(null));
     }
 
+    public List<Book> findAllByTitleStartsWith(String request){
+        return bookRepository.findAllByTitleStartsWith(request);
+    }
 
 }

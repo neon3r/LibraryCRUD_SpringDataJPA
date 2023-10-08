@@ -49,4 +49,8 @@ public class PeopleService {
     public List<Book> bookList(int id) {
         return bookRepository.findByOwner(peopleRepository.findById(id).orElse(null));
     }
+
+    public List<Person> findAllByNameStartsWith(String request) {
+        return peopleRepository.findAllByNameStartsWith(request);
+    }
 }

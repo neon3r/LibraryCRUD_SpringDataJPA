@@ -25,6 +25,12 @@ public class PeopleController {
         return "/people/index";
     }
 
+    @GetMapping("/search")
+    public String search(Model model, @RequestParam(value = "request", required = false, defaultValue = "") String request){
+        model.addAttribute("people", peopleService.findAllByNameStartsWith(request));
+        return "/people/search";
+    }
+
     @GetMapping("/{id}")
     public String show(@PathVariable("id") int id, Model model) {
         model.addAttribute("person", peopleService.findOne(id));
